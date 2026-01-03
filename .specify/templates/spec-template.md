@@ -1,9 +1,23 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
+**Status**: Draft
 **Input**: User description: "$ARGUMENTS"
+
+## Overview
+
+[Brief description of the feature - what it does and why it's needed]
+
+## Visual Design
+
+<!--
+  AUTO-GENERATED: These diagrams are created automatically by /speckit.specify
+  They provide visual context for the feature specification.
+-->
+
+- **Wireframe Diagram**: [wireframe.html](./diagrams/wireframe.html) - 界面布局线框图
+- **Site Diagram**: [site-diagram.html](./diagrams/site-diagram.html) - 应用架构和数据流图
 
 ## User Scenarios & Testing *(mandatory)*
 

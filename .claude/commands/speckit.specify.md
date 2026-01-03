@@ -190,7 +190,51 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+7. **Generate Visual Diagrams**: Create wireframe and architecture diagrams for the feature:
+
+   a. **Create diagrams directory**: `FEATURE_DIR/diagrams/`
+
+   b. **Generate Wireframe Diagram** (`diagrams/wireframe.html`):
+      - Create an interactive HTML wireframe showing the UI layout
+      - Include all major UI components mentioned in the spec
+      - Use a dark theme consistent with developer tools
+      - Add annotations explaining each component's purpose
+      - Structure:
+        ```
+        - Header with app name and action buttons
+        - Main layout with panels/sections from the spec
+        - Component labels and descriptions
+        - Responsive design indicators
+        ```
+
+   c. **Generate Site/Architecture Diagram** (`diagrams/site-diagram.html`):
+      - Create an HTML diagram showing system architecture and data flow
+      - Include sections:
+        1. **System Architecture**: Layer diagram (UI → State → Data → Services)
+        2. **Data Flow**: Step-by-step flow of main user actions
+        3. **Component Responsibilities**: Cards for each major component
+        4. **State Machine** (if applicable): State transitions for key features
+      - Use visual hierarchy with colors for different layers
+      - Add a legend explaining the color coding
+
+   d. **Update spec.md**: Add a "Visual Design" section after Overview linking to the diagrams:
+      ```markdown
+      ## Visual Design
+
+      - **Wireframe Diagram**: [wireframe.html](./diagrams/wireframe.html) - 界面布局线框图
+      - **Site Diagram**: [site-diagram.html](./diagrams/site-diagram.html) - 应用架构和数据流图
+      ```
+
+   e. **Update Checklist**: Add Visual Design section to requirements.md:
+      ```markdown
+      ## Visual Design
+
+      - [x] Wireframe diagram created (wireframe.html)
+      - [x] Site/architecture diagram created (site-diagram.html)
+      - [x] Diagrams linked in spec.md
+      ```
+
+8. Report completion with branch name, spec file path, diagram paths, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
