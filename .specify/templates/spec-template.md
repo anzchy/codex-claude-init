@@ -14,10 +14,30 @@
 <!--
   AUTO-GENERATED: These diagrams are created automatically by /speckit.specify
   They provide visual context for the feature specification.
+
+  IMPORTANT: When the feature involves 3+ pages, a User Flow Diagram is REQUIRED
+  to show the complete user journey through the application.
 -->
 
 - **Wireframe Diagram**: [wireframe.html](./diagrams/wireframe.html) - 界面布局线框图
 - **Site Diagram**: [site-diagram.html](./diagrams/site-diagram.html) - 应用架构和数据流图
+- **User Flow Diagram**: [user-flow.html](./diagrams/user-flow.html) - 用户旅程流程图 *(Required when pages ≥ 3)*
+
+<!--
+  USER FLOW DIAGRAM GUIDELINES (when pages ≥ 3):
+
+  The user flow diagram should include:
+  1. Entry points - How users first access the application
+  2. Authentication flow - Login/register paths and redirects
+  3. Core user journeys - Main task flows with decision points
+  4. Page transitions - Which pages link to which, with trigger actions
+  5. Success/error states - Where users land after key actions
+
+  Example flows to document:
+  - First-time visitor → Login → Main feature → Result
+  - Returning user → Auto-login → Feature → Logout
+  - Error recovery paths (payment failed, session expired, etc.)
+-->
 
 ## User Scenarios & Testing *(mandatory)*
 

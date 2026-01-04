@@ -98,7 +98,24 @@ Given that feature description, do this:
 
 5. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
 
-6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+6. **Generate Visual Diagrams**: Create the diagrams directory and generate HTML diagrams:
+
+   ```bash
+   mkdir -p FEATURE_DIR/diagrams
+   ```
+
+   Generate the following diagram files:
+
+   | File | Purpose | When Required |
+   |------|---------|---------------|
+   | `diagrams/wireframe.html` | 界面布局线框图 - Shows page layouts, component placement, UI structure | Always (if UI changes) |
+   | `diagrams/site-diagram.html` | 应用架构和数据流图 - Shows system architecture, data flow, API interactions | Always (if architecture changes) |
+   | `diagrams/user-flow.html` | 用户旅程流程图 - Shows complete user journey through pages | **REQUIRED if pages ≥ 3** |
+
+   **Diagram Content Guidelines**:
+
+   a. **wireframe.html** - Interactive wireframe showing:
+      - Page layouts for each screen (new and modified)
 
    a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
 
@@ -145,7 +162,7 @@ Given that feature description, do this:
 
    c. **Handle Validation Results**:
 
-      - **If all items pass**: Mark checklist complete and proceed to step 6
+      - **If all items pass**: Mark checklist complete and proceed to step 8
 
       - **If items fail (excluding [NEEDS CLARIFICATION])**:
         1. List the failing items and specific issues
@@ -190,51 +207,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. **Generate Visual Diagrams**: Create wireframe and architecture diagrams for the feature:
-
-   a. **Create diagrams directory**: `FEATURE_DIR/diagrams/`
-
-   b. **Generate Wireframe Diagram** (`diagrams/wireframe.html`):
-      - Create an interactive HTML wireframe showing the UI layout
-      - Include all major UI components mentioned in the spec
-      - Use a dark theme consistent with developer tools
-      - Add annotations explaining each component's purpose
-      - Structure:
-        ```
-        - Header with app name and action buttons
-        - Main layout with panels/sections from the spec
-        - Component labels and descriptions
-        - Responsive design indicators
-        ```
-
-   c. **Generate Site/Architecture Diagram** (`diagrams/site-diagram.html`):
-      - Create an HTML diagram showing system architecture and data flow
-      - Include sections:
-        1. **System Architecture**: Layer diagram (UI → State → Data → Services)
-        2. **Data Flow**: Step-by-step flow of main user actions
-        3. **Component Responsibilities**: Cards for each major component
-        4. **State Machine** (if applicable): State transitions for key features
-      - Use visual hierarchy with colors for different layers
-      - Add a legend explaining the color coding
-
-   d. **Update spec.md**: Add a "Visual Design" section after Overview linking to the diagrams:
-      ```markdown
-      ## Visual Design
-
-      - **Wireframe Diagram**: [wireframe.html](./diagrams/wireframe.html) - 界面布局线框图
-      - **Site Diagram**: [site-diagram.html](./diagrams/site-diagram.html) - 应用架构和数据流图
-      ```
-
-   e. **Update Checklist**: Add Visual Design section to requirements.md:
-      ```markdown
-      ## Visual Design
-
-      - [x] Wireframe diagram created (wireframe.html)
-      - [x] Site/architecture diagram created (site-diagram.html)
-      - [x] Diagrams linked in spec.md
-      ```
-
-8. Report completion with branch name, spec file path, diagram paths, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+8. Report completion with branch name, spec file path, diagrams created, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
@@ -246,6 +219,27 @@ Given that feature description, do this:
 - Avoid HOW to implement (no tech stack, APIs, code structure).
 - Written for business stakeholders, not developers.
 - DO NOT create any checklists that are embedded in the spec. That will be a separate command.
+
+### User Flow Diagram Requirement
+
+**When to create**: If the feature involves **3 or more pages/screens**, a User Flow Diagram is **REQUIRED**.
+
+**What to include in user-flow.html** (`FEATURE_DIR/diagrams/user-flow.html`):
+1. **Entry points** - How users first access the application
+2. **Authentication flow** - Login/register paths and redirects
+3. **Core user journeys** - Main task flows with decision points
+4. **Page transitions** - Which pages link to which, with trigger actions
+5. **Success/error states** - Where users land after key actions
+
+**Example flows to document**:
+- First-time visitor → Login → Main feature → Result
+- Returning user → Auto-login → Feature → Logout
+- Error recovery paths (payment failed, session expired, etc.)
+
+**Page count check**: Count all unique pages/screens including:
+- New pages to add
+- Existing pages with significant UI changes
+- External pages (payment gateways, OAuth providers)
 
 ### Section Requirements
 
