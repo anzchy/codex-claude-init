@@ -116,6 +116,33 @@ Given that feature description, do this:
 
    a. **wireframe.html** - Interactive wireframe showing:
       - Page layouts for each screen (new and modified)
+      - Component hierarchy and placement
+      - Responsive breakpoints if applicable
+      - Navigation elements and their positions
+
+   b. **site-diagram.html** - Architecture diagram showing:
+      - Frontend/Backend components
+      - Database tables and relationships
+      - External service integrations (APIs, payment gateways, auth providers)
+      - Data flow arrows between components
+
+   c. **user-flow.html** - User journey flowchart showing:
+      - Entry points (how users access the app)
+      - Authentication flows (login/register/logout)
+      - Core task flows with decision points
+      - Page-to-page transitions with trigger actions
+      - Success/error states and recovery paths
+      - External redirects (payment pages, OAuth)
+
+   **Page Count Check** (for user-flow.html requirement):
+   Count all unique pages including:
+   - New pages to add
+   - Existing pages with significant UI changes
+   - External pages (payment gateways, OAuth providers)
+
+   If total ≥ 3, user-flow.html is **mandatory**.
+
+7. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
    a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
 
@@ -145,11 +172,17 @@ Given that feature description, do this:
       - [ ] Dependencies and assumptions identified
       
       ## Feature Readiness
-      
+
       - [ ] All functional requirements have clear acceptance criteria
       - [ ] User scenarios cover primary flows
       - [ ] Feature meets measurable outcomes defined in Success Criteria
       - [ ] No implementation details leak into specification
+
+      ## Visual Design Completeness
+
+      - [ ] Wireframe diagram created (if UI changes)
+      - [ ] Site diagram created (if architecture changes)
+      - [ ] User flow diagram created (REQUIRED if pages ≥ 3)
       
       ## Notes
       
