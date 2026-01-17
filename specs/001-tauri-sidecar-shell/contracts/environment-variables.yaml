@@ -1,0 +1,96 @@
+# Environment Variables Contract: Tauri App Shell with Python Sidecar
+# Feature: 001-tauri-sidecar-shell
+# Date: 2026-01-17
+
+# This contract defines environment variables passed from Tauri to the Python sidecar.
+# These variables configure the sidecar's runtime behavior.
+
+variables:
+  READER3_BOOKS_DIR:
+    description: "Path to the books storage directory"
+    required: true
+    source: "Tauri app data directory"
+    example: "~/Library/Application Support/Reader3/books"
+    default: null
+    notes: |
+      - Created by Tauri on first launch if not exists
+      - Contains book subdirectories with *_data/ structure
+      - Must be absolute path (no ~ expansion in sidecar)
+
+  READER3_AI_SETTINGS:
+    description: "Path to the AI settings configuration file"
+    required: true
+    source: "Tauri app config directory"
+    example: "~/Library/Application Support/Reader3/config/ai_settings.json"
+    default: null
+    notes: |
+      - JSON file containing API keys and provider settings
+      - Created with empty config on first launch if not exists
+      - Must be absolute path
+
+  READER3_LIBRARY_UI:
+    description: "Library UI mode selector"
+    required: false
+    source: "Hardcoded in Tauri"
+    example: "modern"
+    default: "modern"
+    notes: |
+      - Controls which library UI template is rendered
+      - Only 'modern' is supported in Phase 1
+
+# Path Resolution
+path_resolution:
+  tauri_api: "tauri::api::path::app_data_dir()"
+  expansion: |
+    Tauri resolves paths using platform-specific APIs.
+    The sidecar receives fully expanded absolute paths.
+    Example: ~/Library/... becomes /Users/username/Library/...
+
+# Directory Structure
+directory_structure:
+  app_data_dir:
+    name: "Reader3"
+    location: "~/Library/Application Support/Reader3/"
+    subdirectories:
+      - name: books
+        purpose: "Book storage with *_data/ subdirectories"
+        env_var: READER3_BOOKS_DIR
+      - name: config
+        purpose: "Configuration files"
+        files:
+          - ai_settings.json
+        env_var_files:
+          ai_settings.json: READER3_AI_SETTINGS
+      - name: logs
+        purpose: "Application log files"
+        files:
+          - reader3.log
+          - reader3.YYYY-MM-DD.log
+
+# Sidecar Spawn Command
+spawn_command:
+  development:
+    command: "uv"
+    args:
+      - "run"
+      - "reader3-server"
+    working_directory: "{project_root}/reader3-pro-python"
+    environment:
+      READER3_BOOKS_DIR: "{app_data_dir}/books"
+      READER3_AI_SETTINGS: "{app_data_dir}/config/ai_settings.json"
+      READER3_LIBRARY_UI: "modern"
+
+  production:
+    notes: |
+      Production sidecar packaging (PyInstaller) is Phase 7.
+      This contract will be updated when that phase is implemented.
+
+# Validation Rules
+validation:
+  on_spawn:
+    - "All required variables must be set"
+    - "Paths must be absolute (no ~ or relative paths)"
+    - "Directories must exist (create if not)"
+  on_sidecar_start:
+    - "Sidecar validates paths are accessible"
+    - "Sidecar creates missing subdirectories as needed"

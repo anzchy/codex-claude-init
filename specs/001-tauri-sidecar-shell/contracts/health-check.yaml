@@ -1,0 +1,71 @@
+# Health Check Contract: Tauri App Shell with Python Sidecar
+# Feature: 001-tauri-sidecar-shell
+# Date: 2026-01-17
+
+openapi: 3.0.3
+info:
+  title: Sidecar Health Check API
+  version: 1.0.0
+  description: |
+    Health check endpoint contract between Tauri app and Python sidecar.
+    The Tauri app polls this endpoint to verify sidecar readiness.
+
+servers:
+  - url: http://127.0.0.1:8123
+    description: Local sidecar server (fixed port for Phase 1)
+
+paths:
+  /:
+    get:
+      summary: Health check endpoint
+      description: |
+        Returns 200 OK when the sidecar is ready to serve requests.
+        The Tauri app polls this endpoint every 500ms during startup.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Sidecar is healthy and ready
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <!DOCTYPE html>
+                <html>...library page...</html>
+        '503':
+          description: Sidecar is starting but not ready yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "starting"
+
+# Polling Configuration
+x-health-check-config:
+  poll_interval_ms: 500
+  timeout_s: 30
+  per_request_timeout_s: 3
+  success_criteria:
+    status_code: 200
+    # Any 200 response indicates readiness; body content is not validated
+
+# State Transitions
+x-state-transitions:
+  - from: Starting
+    to: Healthy
+    condition: "GET / returns 200"
+  - from: Starting
+    to: Failed(HealthCheckTimeout)
+    condition: "30 seconds elapsed without 200 response"
+  - from: Healthy
+    to: Restarting
+    condition: "GET / fails (connection refused, timeout)"
+  - from: Restarting
+    to: Healthy
+    condition: "Restart succeeds, GET / returns 200"
+  - from: Restarting
+    to: Failed(SidecarCrashed)
+    condition: "Restart fails, GET / still failing"

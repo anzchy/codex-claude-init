@@ -1,0 +1,111 @@
+# Error Dialogs Contract: Tauri App Shell with Python Sidecar
+# Feature: 001-tauri-sidecar-shell
+# Date: 2026-01-17
+
+# This contract defines user-facing error dialogs shown during startup failures
+# and mid-session crashes. All dialogs use native macOS alert style.
+
+dialogs:
+  port_in_use:
+    type: error
+    title: "Port Already in Use"
+    message: |
+      Port 8123 is already in use. Please close any other Reader3
+      instances or applications using this port.
+    buttons:
+      - label: "OK"
+        action: close_app
+    icon: warning
+    trigger: StartupError::PortInUse
+    timing: "Within 3 seconds of launch attempt"
+
+  sidecar_spawn_failed:
+    type: error
+    title: "Failed to Start Backend"
+    message: |
+      Could not start the backend server: {detail}.
+      Try reinstalling the application or contact support.
+    message_variables:
+      detail: "Error message from spawn failure"
+    buttons:
+      - label: "OK"
+        action: close_app
+    icon: error
+    trigger: StartupError::SidecarSpawnFailed(detail)
+    timing: "Within 5 seconds of spawn attempt"
+
+  health_check_timeout:
+    type: error
+    title: "Backend Not Responding"
+    message: |
+      The backend server started but did not become ready within 30 seconds.
+      Check the logs for more information.
+    buttons:
+      - label: "View Logs"
+        action: open_log_directory
+      - label: "OK"
+        action: close_app
+    icon: warning
+    trigger: StartupError::HealthCheckTimeout
+    timing: "After 30 seconds of health check polling"
+
+  sidecar_crashed:
+    type: error
+    title: "Backend Crashed"
+    message: |
+      The backend server crashed unexpectedly: {detail}.
+      Try restarting the application.
+    message_variables:
+      detail: "Exit code or signal information"
+    buttons:
+      - label: "View Logs"
+        action: open_log_directory
+      - label: "OK"
+        action: close_app
+    icon: error
+    trigger: StartupError::SidecarCrashed(detail)
+    timing: "When sidecar process exits unexpectedly during startup"
+
+  already_running:
+    type: info
+    title: "Reader3 Already Running"
+    message: |
+      Another instance of Reader3 is already running.
+    buttons:
+      - label: "OK"
+        action: focus_existing_window
+    icon: info
+    trigger: "Single instance plugin detects existing instance"
+    timing: "Immediately on second launch attempt"
+
+  mid_session_crash:
+    type: overlay
+    title: "Connection Lost"
+    message: |
+      Backend connection lost. Click to restart.
+    buttons:
+      - label: "Restart"
+        action: manual_restart_sidecar
+    icon: reconnect
+    trigger: "Auto-restart failed after mid-session crash"
+    timing: "Shown as WebView overlay after failed auto-restart"
+    notes: |
+      This is shown as an in-app overlay, not a native dialog.
+      User can click the button to attempt manual restart.
+
+# Log Directory Path
+log_directory:
+  path: "~/Library/Application Support/Reader3/logs/"
+  action: "Reveal in Finder"
+
+# Dialog Implementation Notes
+implementation:
+  native_dialogs:
+    - port_in_use
+    - sidecar_spawn_failed
+    - health_check_timeout
+    - sidecar_crashed
+    - already_running
+  webview_overlay:
+    - mid_session_crash
+  tauri_api: "tauri::api::dialog::message"

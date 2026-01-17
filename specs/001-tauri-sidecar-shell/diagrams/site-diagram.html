@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tauri Sidecar Architecture - Site Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #00d9ff;
+            font-weight: 300;
+            font-size: 2rem;
+        }
+        .diagram-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .layer {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .component {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 20px 30px;
+            text-align: center;
+            min-width: 200px;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .component:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .component h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .component p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        /* Tauri App Shell */
+        .tauri-shell {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+        }
+        .tauri-shell h3 { color: #00d9ff; }
+        /* Rust Components */
+        .rust {
+            border-color: #ff7043;
+            background: rgba(255, 112, 67, 0.1);
+        }
+        .rust h3 { color: #ff7043; }
+        /* Python Sidecar */
+        .python {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .python h3 { color: #4caf50; }
+        /* Frontend */
+        .frontend {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+        .frontend h3 { color: #ffc107; }
+        /* External */
+        .external {
+            border-color: #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+        }
+        .external h3 { color: #9c27b0; }
+        /* Storage */
+        .storage {
+            border-color: #607d8b;
+            background: rgba(96, 125, 139, 0.1);
+        }
+        .storage h3 { color: #607d8b; }
+        /* Arrows */
+        .arrows {
+            position: relative;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 80px;
+        }
+        .arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888;
+            font-size: 0.75rem;
+        }
+        .arrow-line {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, #888, #444);
+            position: relative;
+        }
+        .arrow-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #888;
+        }
+        .arrow-label {
+            margin-top: 5px;
+            text-align: center;
+        }
+        /* Bidirectional arrow */
+        .arrow-bidir .arrow-line {
+            background: linear-gradient(to bottom, #888, #888);
+        }
+        .arrow-bidir .arrow-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 8px solid #888;
+        }
+        /* Layer labels */
+        .layer-label {
+            position: absolute;
+            left: -20px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 0.8rem;
+            color: #666;
+            letter-spacing: 2px;
+        }
+        .section {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 20px;
+        }
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        /* Flow description */
+        .flow-description {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+        .flow-description h2 {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+        .flow-description ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        .flow-description li {
+            margin-bottom: 8px;
+        }
+        .flow-description code {
+            background: rgba(0, 217, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tauri App Shell + Python Sidecar Architecture</h1>
+
+    <div class="diagram-container">
+        <!-- User Layer -->
+        <div class="section">
+            <span class="layer-label">USER</span>
+            <div class="layer">
+                <div class="component tauri-shell">
+                    <h3>Reader3.app</h3>
+                    <p>macOS Desktop Application</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">Double-click to launch</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrows">
+            <div class="arrow">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">Spawns on launch</span>
+            </div>
+            <div class="arrow">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">Loads after health check</span>
+            </div>
+        </div>
+
+        <!-- Tauri Runtime Layer -->
+        <div class="section">
+            <span class="layer-label">TAURI RUNTIME</span>
+            <div class="layer">
+                <div class="component rust">
+                    <h3>Sidecar Manager</h3>
+                    <p>Process spawn, health check</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">SIGTERM/SIGKILL on close</p>
+                </div>
+                <div class="component frontend">
+                    <h3>WebView</h3>
+                    <p>WKWebView container</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">CSP configured for local HTTP</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrows">
+            <div class="arrow arrow-bidir">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">Child process</span>
+            </div>
+            <div class="arrow arrow-bidir">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">HTTP :8123</span>
+            </div>
+        </div>
+
+        <!-- Python Backend Layer -->
+        <div class="section">
+            <span class="layer-label">PYTHON SIDECAR</span>
+            <div class="layer">
+                <div class="component python">
+                    <h3>FastAPI Server</h3>
+                    <p>reader3-server on :8123</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">uvicorn ASGI</p>
+                </div>
+                <div class="component python">
+                    <h3>EPUB Processor</h3>
+                    <p>ebooklib + BeautifulSoup</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">book.pkl generation</p>
+                </div>
+                <div class="component python">
+                    <h3>AI + Search</h3>
+                    <p>RAG, ChromaDB, providers</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">Streaming SSE</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrows">
+            <div class="arrow arrow-bidir">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">Read/Write</span>
+            </div>
+            <div class="arrow">
+                <div class="arrow-line"></div>
+                <span class="arrow-label">HTTPS API calls</span>
+            </div>
+        </div>
+
+        <!-- Storage + External Layer -->
+        <div class="section">
+            <span class="layer-label">DATA / EXTERNAL</span>
+            <div class="layer">
+                <div class="component storage">
+                    <h3>App Data</h3>
+                    <p>~/Library/Application Support/</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">books/, config/</p>
+                </div>
+                <div class="component external">
+                    <h3>AI Providers</h3>
+                    <p>Anthropic, OpenAI, Gemini</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">OpenRouter, Ollama</p>
+                </div>
+                <div class="component external">
+                    <h3>Google Fonts</h3>
+                    <p>Typography assets</p>
+                    <p style="font-size: 0.75rem; opacity: 0.6;">Optional network</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #00d9ff; background: rgba(0, 217, 255, 0.2);"></div>
+                <span>Tauri App</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #ff7043; background: rgba(255, 112, 67, 0.2);"></div>
+                <span>Rust Runtime</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #4caf50; background: rgba(76, 175, 80, 0.2);"></div>
+                <span>Python Backend</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #ffc107; background: rgba(255, 193, 7, 0.2);"></div>
+                <span>WebView/UI</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #9c27b0; background: rgba(156, 39, 176, 0.2);"></div>
+                <span>External Services</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #607d8b; background: rgba(96, 125, 139, 0.2);"></div>
+                <span>Local Storage</span>
+            </div>
+        </div>
+
+        <!-- Flow Description -->
+        <div class="flow-description">
+            <h2>Startup Flow</h2>
+            <ol>
+                <li>User double-clicks <code>Reader3.app</code></li>
+                <li>Tauri app spawns Python sidecar with env vars (<code>READER3_BOOKS_DIR</code>, <code>READER3_AI_SETTINGS</code>)</li>
+                <li>Sidecar Manager polls <code>GET http://127.0.0.1:8123/</code> every 500ms</li>
+                <li>WebView shows loading indicator during health check</li>
+                <li>On 200 response, WebView navigates to <code>http://127.0.0.1:8123/</code></li>
+                <li>FastAPI serves library.html via Jinja2, existing JS/CSS loads in WebView</li>
+            </ol>
+
+            <h2 style="margin-top: 25px;">Shutdown Flow</h2>
+            <ol>
+                <li>User closes app (Cmd+Q or window close)</li>
+                <li>Tauri sends <code>SIGTERM</code> to sidecar process</li>
+                <li>Wait 2 seconds for graceful shutdown</li>
+                <li>If still running, send <code>SIGKILL</code></li>
+                <li>App window closes, all processes terminated</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
