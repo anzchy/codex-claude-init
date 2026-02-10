@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe - Living Architecture Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            padding: 40px;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+        .last-updated {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            margin-bottom: 40px;
+        }
+
+        .diagram-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .instructions {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        .instructions h3 {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .instructions ul {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wireframe</h1>
+    <p class="subtitle">Living Architecture Diagram - [PROJECT NAME]</p>
+    <p class="last-updated">Last Updated: [DATE] | Feature: [LAST FEATURE MERGED]</p>
+
+    <div class="diagram-container">
+        <!--
+            UNIFIED WIREFRAME TEMPLATE
+
+            This is the single source of truth for all UI states.
+            States are organized following the user-journeys.html logic order.
+
+            Convention:
+            - Each state corresponds to a user journey step
+            - States follow the order defined in user-journeys.html
+            - When a feature adds/modifies UI, update the relevant state here
+            - Feature-specific wireframes (specs/<feature>/diagrams/wireframe.html)
+              should only show the delta from this unified wireframe
+        -->
+
+        <!-- STATE 1: [First user journey step — e.g., First Launch / Onboarding] -->
+        <!-- STATE 2: [Second user journey step — e.g., Main View / Document Open] -->
+        <!-- STATE 3: [Third user journey step — e.g., Search Active] -->
+        <!-- ... add states following user-journeys.html order ... -->
+
+        <div class="instructions">
+            <h3>How to Update This Wireframe</h3>
+            <ul>
+                <li>States are ordered by user journey logic (see user-journeys.html)</li>
+                <li>Add new states when features introduce new UI screens or flows</li>
+                <li>Modify existing states when features change existing UI components</li>
+                <li>Record which feature introduced or modified each state</li>
+                <li>Feature specs should reference this file for the current UI baseline</li>
+                <li>Feature-specific wireframes only show the delta (additions/changes)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

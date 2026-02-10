@@ -39,22 +39,42 @@
 - **System Overview**: [system-overview.html](../../docs/architecture/system-overview.html) - Complete system architecture
 - **Data Flow**: [data-flow.html](../../docs/architecture/data-flow.html) - How data moves through the system
 - **User Journeys**: [user-journeys.html](../../docs/architecture/user-journeys.html) - All user flows across the app
+- **Wireframe**: [wireframe.html](../../docs/architecture/wireframe.html) - Unified UI wireframe for all states
+
+<!--
+  WIREFRAME CONVENTION:
+
+  The project maintains a SINGLE unified wireframe at docs/architecture/wireframe.html.
+  This file is the source of truth for all UI states across all features.
+
+  - States are organized following the user-journeys.html logic order
+    (First Launch → Document Open → Search Active → In-Document Find → Settings → ...)
+  - Each feature spec should UPDATE this shared wireframe rather than creating isolated copies
+  - Feature-specific wireframe.html (in specs/<feature>/diagrams/) should show ONLY
+    the delta — what the feature adds or modifies relative to the unified wireframe
+
+  When implementing a new feature:
+  1. Reference docs/architecture/wireframe.html for the current UI state
+  2. Create specs/<feature>/diagrams/wireframe.html showing ONLY your changes (delta)
+  3. After merge, update docs/architecture/wireframe.html to incorporate the new state
+-->
 
 ### Feature-Specific Diagrams (This Feature's Changes)
 
 > These diagrams show ONLY what this feature adds or modifies.
 
-- **Wireframe (Delta)**: [wireframe.html](./diagrams/wireframe.html) - New/modified UI components only
+- **Wireframe (Delta)**: [wireframe.html](./diagrams/wireframe.html) - New/modified UI components only (delta from unified wireframe)
 - **Diff Diagram**: [diff-diagram.html](./diagrams/diff-diagram.html) - Architecture changes this feature introduces
 
 <!--
   FEATURE DIAGRAM GUIDELINES:
 
-  wireframe.html - Show ONLY:
+  wireframe.html (delta) - Show ONLY:
   - New screens/pages being added
   - Modified components (before → after)
   - New navigation paths
   - DO NOT redraw unchanged parts of the UI
+  - Reference docs/architecture/wireframe.html for context of unchanged parts
 
   diff-diagram.html - Show ONLY:
   - New components (marked NEW)
