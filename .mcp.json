@@ -1,0 +1,62 @@
+{
+  "mcpServers": {
+    "claude-mem": {
+      "args": ["-y", "claude-mem@thedotmack"],
+      "command": "npx"
+    },
+    "mdpro": {
+      "command": "/Applications/mdpro.app/Contents/MacOS/mdpro_mcp"
+    },
+    "oracle": {
+      "args": ["-y", "@steipete/oracle", "oracle-mcp"],
+      "command": "npx"
+    },
+    "playwright": {
+      "args": ["-y", "@playwright/mcp@latest"],
+      "command": "npx"
+    },
+    "openpdf": {
+      "command": "/Users/jackcheng/Library/Application Support/OpenPDF/bin/openpdf-mcp",
+      "args": []
+    },
+    "cccmemory": {
+      "args": [],
+      "command": "cccmemory",
+      "env": {},
+      "type": "stdio"
+    },
+    "github": {
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "command": "npx",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
+      }
+    },
+    "nanobanana": {
+      "args": ["nanobanana-mcp-server@latest"],
+      "command": "uvx",
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      },
+      "type": "stdio"
+    },
+    "vmark": {
+      "command": "/Applications/VMark.app/Contents/MacOS/vmark-mcp-server"
+    },
+    "codex-gpt-5": {
+      "type": "stdio",
+      "command": "codex",
+      "args": ["mcp-server", "--model", "gpt-5.3-codex"],
+      "env": {}
+    },
+    "gemini": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anzchy/mcp-server-gemini"],
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+        "GEMINI_DEFAULT_MODEL": "gemini-3-pro-preview"
+      }
+    }
+  }
+}
