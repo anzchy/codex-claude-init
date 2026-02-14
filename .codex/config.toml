@@ -1,0 +1,57 @@
+[mcp_servers.cccmemory]
+args = [
+    "-y",
+    "cccmemory",
+]
+command = "npx"
+
+[mcp_servers.claude_code_mcp]
+args = [
+    "-y",
+    "@steipete/claude-code-mcp@latest",
+]
+command = "npx"
+
+[mcp_servers.claude_code_mcp.env]
+PATH = "/Users/jackcheng/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+[mcp_servers.github]
+args = [
+    "-y",
+    "@modelcontextprotocol/server-github",
+]
+command = "npx"
+
+[mcp_servers.github.env]
+GITHUB_TOKEN = "xx"
+
+[mcp_servers.mcp_router]
+args = [
+    "-y",
+    "@mcp_router/cli@latest",
+    "connect",
+]
+command = "npx"
+startup_timeout_sec = 120
+
+[mcp_servers.mcp_router.env]
+MCPR_TOKEN = "xx"
+
+[mcp_servers.vmark]
+command = "/Applications/VMark.app/Contents/MacOS/vmark-mcp-server"
+
+[mcp_servers.playwright]
+args = ["@playwright/mcp@latest"]
+command = "npx"
+
+[mcp_servers.gemini]
+command = "npx"
+args = ["-y", "@anzchy/mcp-server-gemini"]
+
+[mcp_servers.gemini.env]
+GEMINI_API_KEY = "xx"
+GEMINI_DEFAULT_MODEL = "gemini-3-pro-preview"
+
+[mcp_servers.openpdf]
+command = "/Users/jackcheng/Library/Application Support/OpenPDF/bin/openpdf-mcp"
+args = []
