@@ -1,92 +1,59 @@
-# [PROJECT_NAME] Constitution
+# AI Code Connect Constitution
 
 ## Core Principles
 
-### I. [PRINCIPLE_1_NAME]
-<!-- Example: Local-First, Cloud-Native, Mobile-First, etc. -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: All features must work offline with local filesystem only. -->
+### I. Atomic Commits (MUST)
+- Every commit MUST represent exactly one logical change.
+- Commit messages MUST follow `type(scope): description`.
+- Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `build`.
+- Unrelated changes MUST NOT be bundled in one commit.
 
-### II. [PRINCIPLE_2_NAME]
-<!-- Example: Simplicity, Modularity, Security-First, etc. -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: No new frameworks unless necessary; reuse existing stack; avoid over-engineering. -->
+### II. Test-Driven Development (MUST)
+- Tests MUST be written before implementation for new logic (Red -> Green -> Refactor).
+- New behavior MUST have at least one automated test.
+- Unit tests use Vitest in `src/**/*.test.ts`.
+- Integration tests, when needed, live in `tests/integration/`.
+- Relevant tests and `npx tsc --noEmit` MUST pass before commit.
 
-### III. [PRINCIPLE_3_NAME]
-<!-- Example: Performance, Scalability, Reliability, etc. -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: Define measurable success criteria for each feature with specific metrics. -->
+### III. Changelog Tracking (MUST)
+- Every feature, fix, and commit MUST be reflected in root `CHANGELOG.md`.
+- Entries MUST be added under `## [Unreleased]` during development.
+- Keep a Changelog categories MUST be used: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+- Entries SHOULD include the related commit hash after commit creation.
 
-### IV. [PRINCIPLE_4_NAME]
-<!-- Example: Platform Conventions, API Standards, Accessibility, etc. -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Follow platform HIG patterns; consistent UI conventions; native integrations. -->
+### IV. Privacy & Local-First (MUST)
+- AIC² itself MUST remain a local CLI bridge with no telemetry by default.
+- Project content MUST NOT be transmitted by AIC² to external services directly.
+- Networked inference is delegated to user-installed upstream CLIs (Claude, Gemini, Codex).
+- Local configuration MUST remain in user-local paths (for example `~/.aic/`).
 
-### V. Changelog Tracking (MANDATORY)
-
-**Every feature added, error fixed, or git commit MUST be documented in `CHANGELOG.md` at the project root.**
-
-Rules:
-1. Maintain a `CHANGELOG.md` file in the project root directory
-2. For every feature added: Add entry under appropriate version section with description
-3. For every bug/error fixed: Add entry with brief description of the fix
-4. For every git commit: Reference the relevant commit hash in the changelog entry
-5. Follow [Keep a Changelog](https://keepachangelog.com/) format:
-   - `Added` for new features
-   - `Changed` for changes in existing functionality
-   - `Deprecated` for soon-to-be removed features
-   - `Removed` for now removed features
-   - `Fixed` for any bug fixes
-   - `Security` for vulnerability fixes
-
-Example entry:
-```markdown
-## [1.2.0] - 2026-02-03
-
-### Added
-- User authentication system (a1b2c3d)
-- Dashboard analytics widget (e4f5g6h)
-
-### Fixed
-- Login timeout issue on slow networks (i7j8k9l)
-```
-
-### VI. [ADDITIONAL_PRINCIPLES]
-<!-- Add more principles as needed for your project -->
-[ADDITIONAL_PRINCIPLE_DESCRIPTION]
+### V. Documentation Consistency (MUST)
+- Behavior/config/default changes MUST update docs in the same commit.
+- Required review targets before commit: `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`, and affected files in `docs/`.
+- Setup instructions, command examples, parameter tables, and defaults MUST match implementation.
 
 ## Development Workflow
 
 ### Code Quality
-<!-- Example: TypeScript strict mode, linting rules, code review requirements -->
-- [CODE_QUALITY_RULE_1]
-- [CODE_QUALITY_RULE_2]
-- [CODE_QUALITY_RULE_3]
+- TypeScript strict compatibility is required.
+- Runtime ESM imports in source use `.js` extensions.
+- Keep adapter behavior behind the `ToolAdapter` contract in `src/adapters/base.ts`.
 
 ### Testing Strategy
-<!-- Example: Unit tests, integration tests, E2E tests -->
-- [TESTING_TOOL_1] for [TEST_TYPE_1]
-- [TESTING_TOOL_2] for [TEST_TYPE_2]
-- [TESTING_TOOL_3] for [TEST_TYPE_3]
+- Unit tests: Vitest (`src/**/*.test.ts`).
+- Integration tests: Vitest (`tests/integration/**/*.test.ts`) when cross-component behavior needs validation.
+- Build/type gates: `npm run build` and `npx tsc --noEmit`.
 
 ## Constraints
 
-<!-- Project-specific limitations and boundaries -->
-- [CONSTRAINT_1]
-<!-- Example: Platform requirements (macOS 13+, iOS 15+, etc.) -->
-- [CONSTRAINT_2]
-<!-- Example: Size limits (max file size, bundle size, etc.) -->
-- [CONSTRAINT_3]
-<!-- Example: Feature exclusions (no PDF export, no plugin system, etc.) -->
-- [CONSTRAINT_4]
-<!-- Example: Dependencies (no external APIs, offline-only, etc.) -->
+- Preserve backward compatibility for default non-settings workflows.
+- Fail closed to read-safe behavior on invalid/unsupported permission mappings.
+- Avoid introducing new external services or telemetry in core flows.
 
 ## Governance
 
-- Constitution supersedes default practices
-- Amendments require documentation and rationale
-- All implementations must verify compliance with these principles
-- [ADDITIONAL_GOVERNANCE_RULES]
+- This constitution supersedes ad-hoc process decisions in planning/tasks artifacts.
+- Any exception requires explicit rationale documented in the relevant spec/plan.
+- Amendments must be made in this file first, then reflected in downstream artifacts.
 
-**Version**: [VERSION] | **Ratified**: [DATE] | **Last Amended**: [DATE]
-<!-- Example: Version: 1.0.0 | Ratified: 2026-02-03 | Last Amended: 2026-02-03 -->
+**Version**: 1.0.0 | **Ratified**: 2026-02-14 | **Last Amended**: 2026-02-14
