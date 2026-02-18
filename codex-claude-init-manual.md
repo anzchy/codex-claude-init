@@ -20,11 +20,24 @@ A step-by-step guide for using this starter toolkit to professionally vibe-code 
    - [Phase 7: Test & Fix Errors](#phase-7-test--fix-errors)
    - [Phase 8: Audit & Harden](#phase-8-audit--harden)
    - [Phase 9: Commit & Ship](#phase-9-commit--ship)
-6. [Workflow Reference](#workflow-reference)
-7. [Agent Reference](#agent-reference)
-8. [Command Reference](#command-reference)
-9. [Customization Guide](#customization-guide)
-10. [FAQ & Troubleshooting](#faq--troubleshooting)
+6. [Codex Integration Guide](#codex-integration-guide)
+   - [Why Dual-Model?](#why-dual-model)
+   - [Setup](#codex-setup)
+   - [Command Map: When to Use Which](#command-map-when-to-use-which)
+   - [Workflow 1: Quick Audit After Changes](#workflow-1-quick-audit-after-changes)
+   - [Workflow 2: Full Audit Before Release](#workflow-2-full-audit-before-release)
+   - [Workflow 3: Audit-Fix-Verify Loop](#workflow-3-audit-fix-verify-loop)
+   - [Workflow 4: Bug Root Cause Analysis](#workflow-4-bug-root-cause-analysis)
+   - [Workflow 5: Plan Review Before Building](#workflow-5-plan-review-before-building)
+   - [Workflow 6: Delegate Implementation](#workflow-6-delegate-implementation)
+   - [Workflow 7: End-to-End Issue Resolution](#workflow-7-end-to-end-issue-resolution)
+   - [Thread Continuation](#thread-continuation)
+   - [Project-Level Configuration](#project-level-configuration)
+7. [Workflow Reference](#workflow-reference)
+8. [Agent Reference](#agent-reference)
+9. [Command Reference](#command-reference)
+10. [Customization Guide](#customization-guide)
+11. [FAQ & Troubleshooting](#faq--troubleshooting)
 
 ---
 
@@ -34,9 +47,10 @@ A step-by-step guide for using this starter toolkit to professionally vibe-code 
 
 - **`AGENTS.md`** — A shared source-of-truth file that instructs all AI coding tools (Claude Code, Codex CLI, Gemini CLI) how to work on your project
 - **9 specialized agents** — Markdown role definitions for planning, implementing, testing, auditing, and releasing code
-- **3 slash commands** — `/feature-workflow` (full feature pipeline), `/fix` (bug fixing), `/audit-fix` (code auditing)
+- **15 slash commands** — `/feature-workflow` (full feature pipeline), `/fix` (bug fixing), `/audit-fix` (Claude-only auditing), 10 `/codex-*` commands (dual-model workflows), `/fix-issue` (GitHub issue resolver), `/merge-prs` (PR management)
 - **2 project rules** — Auto-loaded engineering principles and TDD enforcement
 - **4 skills** — Planning, plan-audit, plan-verify, and release-gate
+- **Codex dual-model integration** — Use Codex CLI as an independent auditor/reviewer running in an isolated sandbox to catch hallucinations and blind spots
 - **SpecKit integration** — Pre-existing spec-driven development commands
 
 Clone this repo, customize for your project, and start building with professional AI-assisted workflows.
@@ -131,12 +145,30 @@ claude
 │   ├── commands/                      # Slash commands
 │   │   ├── feature-workflow.md        # 9-step gated feature pipeline
 │   │   ├── fix.md                     # Root-cause bug fixing
-│   │   ├── audit-fix.md              # Audit → fix → verify loop
+│   │   ├── audit-fix.md              # Audit → fix → verify loop (Claude-only)
+│   │   ├── codex-preflight.md        # Check Codex connectivity & models
+│   │   ├── codex-init.md             # Generate project-level Codex config
+│   │   ├── codex-audit-mini.md       # Fast 6-dimension audit via Codex
+│   │   ├── codex-audit.md            # Full 10-dimension audit via Codex
+│   │   ├── codex-audit-fix.md        # Audit→fix→verify loop with Codex
+│   │   ├── codex-bug-analyze.md      # Root cause analysis via Codex
+│   │   ├── codex-review-plan.md      # Architectural plan review via Codex
+│   │   ├── codex-implement.md        # Delegate plan to Codex for execution
+│   │   ├── codex-verify.md           # Verify fixes from previous audit
+│   │   ├── codex-continue.md         # Continue a previous Codex session
+│   │   ├── fix-issue.md              # End-to-end GitHub issue resolver
+│   │   ├── merge-prs.md              # Safe PR review and merge
+│   │   ├── _model-selection.md       # Internal: model selection alias
+│   │   ├── shared/
+│   │   │   └── model-selection.md    # Internal: dynamic model discovery
 │   │   └── speckit.*.md              # SpecKit spec-driven commands
 │   │
 │   ├── rules/                         # Auto-loaded every session
 │   │   ├── 00-engineering-principles.md
 │   │   └── 10-tdd.md
+│   │
+│   ├── scripts/                       # Helper scripts
+│   │   └── codex-preflight.sh         # Probes Codex models & auth
 │   │
 │   └── skills/                        # Loaded on demand
 │       ├── planning/                  # Plan creation + templates
@@ -606,9 +638,9 @@ The **Auditor agent** reviews all diffs for:
 
 If issues are found, it loops back to the **Implementer** for fixes. This cycle repeats until the audit passes.
 
-#### Via `/audit-fix` (manual)
+#### Via `/audit-fix` (Claude-only)
 
-Run an audit on your recent changes:
+Run a Claude-only audit on your recent changes:
 
 ```
 /audit-fix                 # Audit uncommitted changes
@@ -622,6 +654,20 @@ The audit-fix loop:
 2. **Fix** — Fixes every finding (Critical through Low)
 3. **Verify** — Confirms all fixes are correct
 4. **Loop** — Repeats up to 3 times until zero findings remain
+
+#### Via Codex dual-model audit (recommended for important changes)
+
+For higher confidence, use the Codex-powered commands that run audits in an **isolated second model**. This catches blind spots that a single model would miss:
+
+```
+/codex-audit-mini              # Fast 6-dimension audit (logic, duplication, dead code, debt, shortcuts, comments)
+/codex-audit                   # Full 10-dimension audit (adds security, performance, compliance, deps, docs)
+/codex-audit-fix               # Full audit→fix→verify loop (Claude fixes, Codex verifies — or vice versa)
+```
+
+The dual-model advantage: Claude writes the code, Codex reviews it independently. If Codex finds issues, Claude (or Codex) fixes them, and then Codex re-verifies. This cross-model verification catches hallucinations, subtle logic errors, and security issues that self-review misses.
+
+See the [Codex Integration Guide](#codex-integration-guide) for detailed setup and usage.
 
 #### Verification
 
@@ -699,6 +745,324 @@ gh pr create --title "feat: add user authentication" --body "..."
 
 ---
 
+## Codex Integration Guide
+
+### Why Dual-Model?
+
+When a single AI model writes code and reviews its own output, it has blind spots — it tends to confirm its own logic rather than challenge it. The Codex integration solves this by using **two independent models**:
+
+```
+┌──────────────┐         ┌──────────────┐
+│  Claude Code │         │  Codex CLI   │
+│  (primary)   │────────→│  (reviewer)  │
+│              │         │              │
+│  Writes code │         │  Reads code  │
+│  Fixes bugs  │         │  In sandbox  │
+│  Full context│         │  Isolated    │
+└──────────────┘         └──────────────┘
+       │                        │
+       │     ┌──────────┐      │
+       └────→│  Result  │←─────┘
+             │  Compare │
+             └──────────┘
+```
+
+**Claude Code** is the primary coder — it has full project context, can edit files, run commands, and manage sessions. **Codex CLI** runs in a read-only sandbox as an independent auditor. It sees the same files but has no shared memory with Claude, so it brings genuinely fresh eyes to every review.
+
+This pattern catches:
+- **Hallucinated logic** — Claude generates plausible-looking code that Codex flags as incorrect
+- **Missed edge cases** — Different models have different intuitions about boundary conditions
+- **Security blind spots** — Cross-model review significantly improves vulnerability detection
+- **Stale assumptions** — Codex re-reads files from disk, catching cases where Claude's cached understanding drifted from reality
+
+### Codex Setup
+
+#### Step 1: Install Codex CLI
+
+```bash
+npm install -g @openai/codex
+```
+
+#### Step 2: Authenticate
+
+```bash
+# Preferred: use ChatGPT Plus/Pro subscription (dramatically cheaper for sustained use)
+codex login
+
+# Fallback: API key (for light or automated usage)
+codex login --with-api-key
+```
+
+#### Step 3: Add Codex as MCP server
+
+Add to your project's `.mcp.json` (or Claude Code's MCP settings):
+
+```json
+{
+  "mcpServers": {
+    "codex": {
+      "command": "codex",
+      "args": ["mcp-server"]
+    }
+  }
+}
+```
+
+#### Step 4: Verify connectivity
+
+Inside Claude Code:
+
+```
+/codex-preflight
+```
+
+This runs the preflight script that probes which Codex models are available, checks authentication, and reports the results. You should see a list of available models (e.g. `gpt-5.3-codex`, `gpt-5.2-codex`).
+
+#### Step 5 (optional): Initialize project config
+
+```
+/codex-init
+```
+
+This generates a `.codex-toolkit-for-claude.md` file in your project root that customizes how all `/codex-*` commands behave. It detects your tech stack, asks about audit focus (balanced / security-first / performance-first / quality-first), and sets default model and reasoning effort. You can skip this — all commands work with sensible defaults.
+
+### Command Map: When to Use Which
+
+| Situation | Command | What Happens |
+|-----------|---------|-------------|
+| Quick sanity check after small changes | `/codex-audit-mini` | Fast 6-dimension audit: logic, duplication, dead code, refactoring debt, shortcuts, code comments |
+| Thorough review before release or merge | `/codex-audit` | Full 10-dimension audit: adds security, performance, compliance, dependencies, documentation |
+| Fix everything automatically | `/codex-audit-fix` | Audit → fix → verify loop (max 3 rounds). Choose Claude or Codex as fixer. |
+| Investigate a stubborn bug | `/codex-bug-analyze` | Codex traces data flow, state management, error handling to find root cause |
+| Review a plan before building | `/codex-review-plan` | 5-dimension plan review: consistency, completeness, feasibility, ambiguity, risk |
+| Delegate implementation to Codex | `/codex-implement` | Send a plan file; Codex executes it autonomously in sandbox |
+| Verify fixes from previous audit | `/codex-verify` | Checks each issue from a previous audit report — FIXED / NOT FIXED / PARTIAL |
+| Continue a previous Codex conversation | `/codex-continue` | Resume a thread to iterate on findings, request fixes, or drill deeper |
+| Resolve a GitHub issue end-to-end | `/fix-issue #123` | Fetch → classify → branch → TDD fix → Codex audit loop → gate → PR |
+| Merge multiple PRs safely | `/merge-prs` | Review, rebase, merge sequentially with conflict handling |
+
+### Workflow 1: Quick Audit After Changes
+
+**When**: You've made some changes and want a quick sanity check before committing.
+
+```
+/codex-audit-mini
+```
+
+The command will:
+1. Ask you to choose a Codex model and reasoning effort
+2. Detect uncommitted changes via `git diff`
+3. Send each changed file to Codex for 6-dimension review
+4. Present a findings table with file:line, severity, and suggested fixes
+
+If no issues: you get a CLEAN verdict. If issues found: fix them manually or run `/codex-audit-fix` to automate.
+
+**Scope options:**
+```
+/codex-audit-mini                    # Uncommitted changes (default)
+/codex-audit-mini staged             # Only staged changes
+/codex-audit-mini commit -1          # Last commit
+/codex-audit-mini commit -3          # Last 3 commits
+/codex-audit-mini src/auth/          # Specific directory
+```
+
+### Workflow 2: Full Audit Before Release
+
+**When**: Before merging to main, creating a release, or after a large feature is complete.
+
+```
+/codex-audit
+```
+
+Same scoping options as mini audit, but covers 10 dimensions:
+
+| # | Dimension | Checks |
+|---|-----------|--------|
+| 1 | Redundant & Low-Value Code | Dead code, duplicates, unused imports |
+| 2 | Security & Risk Management | Injection, XSS, hardcoded secrets, auth issues |
+| 3 | Code Correctness & Reliability | Logic errors, race conditions, null deref, resource leaks |
+| 4 | Compliance & Standards | Naming conventions, framework best practices |
+| 5 | Maintainability & Readability | Complexity, magic numbers, DRY violations |
+| 6 | Performance & Efficiency | N+1 queries, O(n^2) algorithms, blocking I/O |
+| 7 | Testing & Validation | Coverage gaps, flaky tests |
+| 8 | Dependency & Environment Safety | Known CVEs, outdated packages |
+| 9 | Documentation & Knowledge Transfer | Missing docs, outdated comments |
+| 10 | Code Comments & Headers | Stale comments, missing function docs, TODO rot |
+
+The output is a structured report with severity ratings and a PASS / NEEDS WORK / BLOCKED verdict.
+
+### Workflow 3: Audit-Fix-Verify Loop
+
+**When**: You want issues found AND fixed automatically, with independent verification.
+
+```
+/codex-audit-fix
+```
+
+This is the most powerful command. It runs a complete cycle:
+
+```
+┌─────────┐     ┌───────┐     ┌────────┐
+│  Audit  │────→│  Fix  │────→│ Verify │
+│ (Codex) │     │ (your │     │ (Codex)│
+│         │     │ choice)│     │        │
+└─────────┘     └───────┘     └────────┘
+     ▲                             │
+     │         if issues remain    │
+     └─────────────────────────────┘
+              (max 3 rounds)
+```
+
+**Step-by-step:**
+
+1. Codex audits your changes (mini 6-dim or full 10-dim — you choose)
+2. Findings are presented with severity ratings
+3. You choose: fix all / fix Critical+High only / stop here
+4. You choose who fixes: **Claude** (has full project context, precise edits) or **Codex** (sandboxed, autonomous)
+5. Fixes are applied
+6. Codex independently verifies each fix: FIXED / NOT FIXED / PARTIAL / REGRESSED
+7. If issues remain and rounds < 3: loop back to step 4
+8. Final report with full audit trail
+
+**The dual-model magic**: When Claude fixes and Codex verifies (or vice versa), you get genuine cross-validation. One model's hallucination is caught by the other's independent review.
+
+**Scope options:**
+```
+/codex-audit-fix                     # Mini audit on uncommitted changes
+/codex-audit-fix --full              # Full 10-dimension audit
+/codex-audit-fix --full src/auth/    # Full audit on specific path
+/codex-audit-fix commit -2           # Mini audit on last 2 commits
+```
+
+### Workflow 4: Bug Root Cause Analysis
+
+**When**: You have a bug you can't figure out, or you want an independent investigation before spending time debugging.
+
+```
+/codex-bug-analyze The login page shows a blank screen after OAuth redirect on Safari
+```
+
+Codex independently investigates:
+1. **Logic Flow** — Traces execution paths related to your bug description
+2. **State Management** — Checks for race conditions, stale state, async issues
+3. **Data Flow** — Traces data transformations, type coercion, null propagation
+4. **Error Handling** — Finds swallowed exceptions, missing error cases
+5. **Edge Cases** — Tests boundary conditions, platform-specific behavior
+
+The output is a structured report with:
+- **Root cause** (with confidence level)
+- **Contributing factors** with file:line locations
+- **Related bugs** found by searching for similar patterns elsewhere
+- **Recommended fix** (immediate vs proper)
+- **Test cases to add**
+
+After the analysis, use `/codex-continue <threadId>` to drill deeper into any finding.
+
+### Workflow 5: Plan Review Before Building
+
+**When**: You've written a plan (via `/feature-workflow`, SpecKit, or manually) and want an independent architectural review before implementation.
+
+```
+/codex-review-plan docs/plans/user-authentication.md
+```
+
+Codex evaluates the plan across 5 buildability dimensions:
+
+| # | Dimension | What it checks |
+|---|-----------|---------------|
+| 1 | Internal Consistency | Do decisions contradict each other? |
+| 2 | Completeness | Are error paths, startup/shutdown, edge cases covered? |
+| 3 | Feasibility | Can this actually be built as described? API misuse? |
+| 4 | Ambiguity | Where would an implementer get stuck? |
+| 5 | Risk & Sequencing | Is the build order correct? High-risk items addressed early? |
+
+The output includes a **verdict** (READY TO BUILD / NEEDS REVISION / MAJOR GAPS), top 3 risks, and specific recommendations per finding.
+
+This is useful as a pre-implementation gate: catch fundamental issues before writing any code.
+
+### Workflow 6: Delegate Implementation
+
+**When**: You have a well-defined plan and want Codex to implement it autonomously while you do other things.
+
+```
+/codex-implement docs/plans/user-authentication.md
+```
+
+This sends the plan to Codex running in a sandboxed environment with write access. Codex:
+1. Reads the plan
+2. Creates files, installs dependencies, writes code
+3. Runs tests and builds
+4. Reports what it did (files created/modified, commands run, issues encountered)
+
+After Codex finishes, Claude verifies the results by running `git status`, `git diff`, and your project's test suite.
+
+**When NOT to use this**: For complex features with many interdependencies, Claude's interactive approach (with full project context and your real-time feedback) is more reliable. Use `/codex-implement` for well-scoped, self-contained tasks where the plan is unambiguous.
+
+### Workflow 7: End-to-End Issue Resolution
+
+**When**: You have GitHub issues to resolve and want the full pipeline automated.
+
+```
+/fix-issue #123
+```
+
+The complete pipeline:
+1. **Fetch** — Downloads issue details from GitHub
+2. **Classify** — Bug / Feature / Question (by labels or content)
+3. **Branch** — Creates `fix/issue-123-description` or `feat/issue-123-description`
+4. **Resolve** — Bug path (TDD fix), Feature path (research + TDD), or Question path (post answer as comment)
+5. **Codex audit** — Runs up to 3 rounds of audit→fix→verify on changed files
+6. **Gate** — Runs your project's test command
+7. **PR** — Creates a pull request with audit summary
+
+**Multi-issue mode:**
+```
+/fix-issue #123 #456 #789
+```
+Creates parallel worktrees and resolves each issue independently using background agents.
+
+### Thread Continuation
+
+Every Codex command returns a **thread ID**. Codex threads preserve full conversation context, so you can iterate:
+
+```
+/codex-continue abc-123-def "Now fix the 3 Critical issues you found"
+/codex-continue abc-123-def "Explain the race condition in more detail"
+/codex-continue abc-123-def "Run the tests and report results"
+```
+
+Threads are **in-memory only** — they're lost when the Codex MCP server restarts (e.g. when you restart Claude Code). If a thread is gone, re-run the original command to start fresh.
+
+### Project-Level Configuration
+
+Run `/codex-init` to generate a `.codex-toolkit-for-claude.md` config file. This customizes all `/codex-*` commands for your specific project:
+
+```markdown
+# What you can configure:
+
+## Defaults
+- Default model: gpt-5.3-codex
+- Default effort: high
+- Default audit type: mini
+- Default sandbox: workspace-write
+
+## Audit Focus
+- Balanced (equal weight across all dimensions)
+- Security-first (auth, injection, data exposure flagged as Critical)
+- Performance-first (N+1 queries, O(n^2), blocking I/O flagged as High)
+- Quality-first (untested paths, high complexity flagged as High)
+
+## Skip Patterns
+node_modules/, dist/, build/, coverage/, *.min.js, *.lock, vendor/
+
+## Project-Specific Instructions
+"This is a Next.js 14 project using Supabase. Follow existing patterns in src/components/."
+```
+
+The config file is optional — all commands work with sensible defaults. Commit it to share settings with your team, or gitignore it for personal preferences.
+
+---
+
 ## Workflow Reference
 
 ### Which workflow to use
@@ -707,7 +1071,19 @@ gh pr create --title "feat: add user authentication" --body "..."
 |-----------|----------|---------|
 | **New feature** (medium-large) | Feature Workflow | `/feature-workflow [name]` |
 | **Bug fix** (any size) | Fix | `/fix [description]` |
-| **Code audit** | Audit-Fix Loop | `/audit-fix [scope]` |
+| **Code audit** (Claude-only) | Audit-Fix Loop | `/audit-fix [scope]` |
+| **Quick audit** (dual-model) | Codex Mini Audit | `/codex-audit-mini [scope]` |
+| **Full audit** (dual-model) | Codex Full Audit | `/codex-audit [scope]` |
+| **Audit + auto-fix** (dual-model) | Codex Audit-Fix | `/codex-audit-fix [scope]` |
+| **Bug investigation** (dual-model) | Codex Bug Analysis | `/codex-bug-analyze <desc>` |
+| **Plan review** (dual-model) | Codex Plan Review | `/codex-review-plan [file]` |
+| **Delegate implementation** | Codex Implement | `/codex-implement <plan>` |
+| **Verify audit fixes** | Codex Verify | `/codex-verify <report>` |
+| **Continue Codex thread** | Codex Continue | `/codex-continue <threadId>` |
+| **Resolve GitHub issues** | Fix Issue | `/fix-issue #N` |
+| **Merge open PRs** | Merge PRs | `/merge-prs` |
+| **Check Codex connectivity** | Codex Preflight | `/codex-preflight` |
+| **Configure Codex for project** | Codex Init | `/codex-init` |
 | **Create specification** | SpecKit | `/speckit.specify [description]` |
 | **Generate plan from spec** | SpecKit | `/speckit.plan` |
 | **Generate tasks from plan** | SpecKit | `/speckit.tasks` |
@@ -798,13 +1174,77 @@ Root-cause bug fixing with TDD. No patches, no shortcuts.
 
 ### `/audit-fix [scope]`
 
-Audit → fix → verify loop. Runs up to 3 iterations.
+Audit → fix → verify loop (Claude-only). Runs up to 3 iterations.
 
 ```
 /audit-fix                    # Uncommitted changes
 /audit-fix staged             # Staged changes
 /audit-fix commit -1          # Last commit
 /audit-fix src/auth/          # Specific path
+```
+
+### Codex Commands (Dual-Model)
+
+Setup and connectivity:
+
+```
+/codex-preflight               # Check Codex connectivity, list available models
+/codex-init                    # Generate .codex-toolkit-for-claude.md project config
+```
+
+Auditing (read-only — Codex reviews, doesn't change files):
+
+```
+/codex-audit-mini              # Fast 6-dimension audit (logic, duplication, dead code, debt, shortcuts, comments)
+/codex-audit-mini staged       # Audit staged changes
+/codex-audit-mini commit -3    # Audit last 3 commits
+/codex-audit-mini src/auth/    # Audit specific path
+
+/codex-audit                   # Full 10-dimension audit (adds security, performance, compliance, deps, docs)
+/codex-audit --full            # Entire codebase
+/codex-audit commit -1         # Last commit
+```
+
+Audit + auto-fix (Codex audits, Claude or Codex fixes, Codex verifies):
+
+```
+/codex-audit-fix               # Mini audit → fix → verify on uncommitted changes
+/codex-audit-fix --full        # Full 10-dim audit → fix → verify
+/codex-audit-fix --full src/   # Full audit on specific path
+```
+
+Investigation and review:
+
+```
+/codex-bug-analyze Login fails after OAuth redirect on Safari
+/codex-bug-analyze Memory leak in WebSocket handler after 1000+ connections
+/codex-review-plan docs/plans/user-auth.md
+/codex-review-plan plan.md +AGENTS.md +docs/architecture.md    # Plan + context files
+```
+
+Implementation and verification:
+
+```
+/codex-implement docs/plans/user-auth.md    # Delegate plan to Codex
+/codex-verify audit-report.md               # Verify fixes from previous audit
+```
+
+Thread continuation:
+
+```
+/codex-continue abc-123 "Fix the Critical issues you found"
+/codex-continue abc-123 "Explain the race condition in detail"
+/codex-continue abc-123 "Run tests and report"
+```
+
+### GitHub Integration Commands
+
+```
+/fix-issue #123                # Resolve single issue end-to-end
+/fix-issue #123 #456 #789     # Resolve multiple issues in parallel
+/merge-prs                     # Merge your open PRs
+/merge-prs #12 #34             # Merge specific PRs
+/merge-prs --pattern fix/*     # Merge PRs matching branch pattern
 ```
 
 ### SpecKit Commands
@@ -924,10 +1364,11 @@ The `AGENTS.md` file is tool-agnostic. Codex CLI reads it automatically. The `.c
 - `.codex/prompts/` is Codex's equivalent of `.claude/commands/`
 - Codex reads `AGENTS.md` directly
 
-### Q: How do I add a second-opinion audit with Codex?
+### Q: How do I set up Codex as a second-opinion auditor?
 
-1. Install Codex: `npm install -g @openai/codex && codex login`
-2. Add to `.mcp.json`:
+1. Install Codex: `npm install -g @openai/codex`
+2. Authenticate: `codex login` (use ChatGPT Plus/Pro subscription)
+3. Add to `.mcp.json`:
    ```json
    {
      "mcpServers": {
@@ -938,7 +1379,42 @@ The `AGENTS.md` file is tool-agnostic. Codex CLI reads it automatically. The `.c
      }
    }
    ```
-3. Use `/audit-fix` — it can leverage Codex as an MCP tool for cross-model verification.
+4. Verify: `/codex-preflight` — should show available models
+5. (Optional) Configure: `/codex-init` — generates project-specific defaults
+6. Start using: `/codex-audit-mini` for quick checks, `/codex-audit-fix` for the full loop
+
+### Q: What's the difference between `/audit-fix` and `/codex-audit-fix`?
+
+`/audit-fix` is **Claude-only** — Claude reads the code, finds issues, fixes them, and verifies its own fixes. It's fast and has full project context, but it's a single model reviewing its own work.
+
+`/codex-audit-fix` is **dual-model** — Codex audits independently in a sandbox, then either Claude or Codex fixes the issues, and Codex re-verifies. The cross-model validation catches blind spots that self-review misses. Use `/codex-audit-fix` when:
+- Changes touch security-sensitive code (auth, payments, crypto)
+- You're about to merge to main or create a release
+- You've been debugging for a while and want fresh eyes
+- The change is complex enough that you don't trust a single model's review
+
+### Q: Codex thread expired — what do I do?
+
+Codex threads are in-memory only and are lost when the MCP server restarts. If `/codex-continue <threadId>` fails:
+- Re-run the original command (`/codex-audit`, `/codex-bug-analyze`, etc.) to start a fresh thread
+- The new thread starts from scratch but reads current file state, so your previous fixes are preserved
+
+### Q: Which Codex model should I pick?
+
+When running a `/codex-*` command, you'll be asked to choose a model. General guidance:
+
+| Model | Best for |
+|-------|----------|
+| `gpt-5.3-codex` | Most tasks — strongest reasoning, best for audits and bug analysis |
+| `gpt-5.2-codex` | Faster, good enough for verification and simple audits |
+| `gpt-5-codex-mini` | Quick checks, trivial changes — cheapest and fastest |
+| `o4-mini` | When you want fast reasoning at low cost |
+
+If unsure, accept the recommended default. You can also run `/codex-init` to set a project-level default.
+
+### Q: Can I use Codex to implement a plan while I work on something else?
+
+Yes. `/codex-implement plan.md` sends the plan to Codex for autonomous execution in a sandbox. Codex creates files, installs dependencies, writes code, and runs tests. After it finishes, Claude verifies the results. This works best for well-scoped, self-contained tasks where the plan is unambiguous. For complex features with many interdependencies, Claude's interactive approach is more reliable.
 
 ### Q: Context is running low during a long session
 
