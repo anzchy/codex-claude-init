@@ -46,7 +46,7 @@
     "codex-gpt-5": {
       "type": "stdio",
       "command": "codex",
-      "args": ["mcp-server", "--model", "gpt-5.3-codex"],
+      "args": ["mcp-server", "-c", "model=\"gpt-5.3-codex\""],
       "env": {}
     },
     "gemini": {
