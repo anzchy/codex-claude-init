@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "claude-mem": {
+      "args": ["-y", "claude-mem@thedotmack"],
+      "command": "npx"
+    },
+
+    "cccmemory": {
+      "args": [],
+      "command": "cccmemory",
+      "env": {},
+      "type": "stdio"
+    },
+    "vmark": {
+      "command": "/Applications/VMark.app/Contents/MacOS/vmark-mcp-server"
+    },
+    "codex-gpt-5": {
+      "type": "stdio",
+      "command": "codex",
+      "args": ["mcp-server", "-c", "model=\"gpt-5.3-codex\""],
+      "env": {}
+    },
+    "gemini-cli": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "gemini-mcp-tool"
+          ],
+          "env": {}
+        }
+  }
+}

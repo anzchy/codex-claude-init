@@ -57,6 +57,15 @@
         "GEMINI_API_KEY": "${GEMINI_API_KEY}",
         "GEMINI_DEFAULT_MODEL": "gemini-3-pro-preview"
       }
-    }
+    },
+    "gemini-cli": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "gemini-mcp-tool"
+          ],
+          "env": {}
+        }
   }
 }
