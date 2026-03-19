@@ -1,5 +1,11 @@
 {
   "permissions": {
     "allow": []
+  },
+  "enabledPlugins": {
+    "grill@xiaolai": true,
+    "codex-toolkit@xiaolai": true,
+    "echo-sleuth@xiaolai": true,
+    "loc-guardian@xiaolai": true
   }
 }
